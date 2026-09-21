@@ -1,0 +1,11 @@
+0 Kleidungsstücke
+1 Schulsachen
+2 Trinkflasche
+3 Brotdose
+4 Regenschirm
+5 Schlüssel
+6 Kopfhörer
+7 Powerbank/Ladekabel
+8 Brille
+9 Geldtasche
+10 Taschenrechner
