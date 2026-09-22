@@ -1,11 +1,9 @@
-"""Teachable-Machine Bilderkennung für die Fundbox (TestKI4).
+"""Teachable-Machine Bilderkennung für die Fundbox (TestKI4) — ohne TensorFlow.
 
-Primärmodell: ``keras_model.h5`` (Teachable Machine, 224x224 RGB,
-Normalisierung x/127.5 - 1, 11 Klassen aus ``labels.txt``).
-
-Läuft ohne Streamlit-Abhängigkeit, damit die Logik headless testbar bleibt.
-TensorFlow wird nur lazy importiert: Fehlt TF, meldet ``predict_teachable``
-``None`` zurück und die App zeigt einen ehrlichen Hinweis.
+Die Gewichte aus ``keras_model.h5`` werden mit purem numpy gerechnet
+(``keras_numpy.py``, MobileNetV2-Forward-Pass). Läuft überall, wo es
+numpy + h5py gibt — auch auf Python 3.14 ohne TF-Wheels.
+Klassen: ``labels.txt``.
 """
 
 from __future__ import annotations
@@ -18,26 +16,20 @@ import numpy as np
 from PIL import Image
 
 # --------------------------------------------------------------------------
-# Quellen (TestKI4-Original)
+# Quellen (TestKI4-Original) — das Modell selbst lädt keras_numpy.
 # --------------------------------------------------------------------------
-TESTKI4_MODEL_URL = (
-    "https://raw.githubusercontent.com/kumma-git/TestKI4/main/keras_model.h5"
-)
 TESTKI4_LABELS_URL = (
     "https://raw.githubusercontent.com/kumma-git/TestKI4/main/labels.txt"
 )
-
-MODEL_FILE = Path("keras_model.h5")
 # TestKI4 nennt die Datei labels.txt (Format "0 Klassenname").
 LABEL_FILES = [Path("teachable_labels.txt"), Path("labels.txt")]
 
 IMAGE_SIZE = 224
 
 # --------------------------------------------------------------------------
-# Mapping: 11 Teachable-Klassen -> Fundbox-Kategorien (1:1, gleiche Namen)
-# --------------------------------------------------------------------------
 # Mapping: Teachable-Klasse -> Fundbox-Kategorie (1:1, gleiche Namen).
 # Die 11 Klassen aus labels.txt SIND die Kategorien der Fundbox.
+# --------------------------------------------------------------------------
 TEACHABLE_TO_CATEGORY = {name: name for name in [
     "Kleidungsstücke",
     "Schulsachen",
@@ -52,20 +44,8 @@ TEACHABLE_TO_CATEGORY = {name: name for name in [
     "Taschenrechner",
 ]}
 
-# Fallback, falls labels.txt fehlt: Reihenfolge aus TestKI4 (Stand Sep 2026).
-BUILTIN_LABELS = [
-    "Kleidungsstücke",
-    "Schulsachen",
-    "Trinkflasche",
-    "Brotdose",
-    "Regenschirm",
-    "Schlüssel",
-    "Kopfhörer",
-    "Powerbank/Ladekabel",
-    "Brille",
-    "Geldtasche",
-    "Taschenrechner",
-]
+# Fallback, falls labels.txt fehlt: Reihenfolge aus TestKI4.
+BUILTIN_LABELS = list(TEACHABLE_TO_CATEGORY)
 
 
 # --------------------------------------------------------------------------
@@ -126,31 +106,21 @@ def load_teachable_labels() -> list[str]:
 
 
 # --------------------------------------------------------------------------
-# Modell (lazy TF-Import, gecached)
+# Modell (numpy-Engine auf keras_model.h5, gecached) — kein TensorFlow nötig
 # --------------------------------------------------------------------------
 @lru_cache(maxsize=1)
-def load_teachable_model():
-    """Lädt keras_model.h5 oder gibt None zurück (TF fehlt / Datei fehlt)."""
+def load_teachable_graph():
+    """Netzwerk-Graph + Gewichte oder None (Datei fehlt / h5py fehlt)."""
     try:
-        import tensorflow as tf  # noqa: F401  (lokaler Import, optional)
+        import keras_numpy  # noqa: F401
     except Exception:
         return None
-    import tensorflow as tf
+    import keras_numpy
 
-    path = ensure_file(MODEL_FILE, TESTKI4_MODEL_URL)
-    if path is None:
-        return None
     try:
-        return tf.keras.models.load_model(str(path), compile=False)
+        return keras_numpy.load_graph()
     except Exception:
         return None
-
-
-def softmax(logits: np.ndarray) -> np.ndarray:
-    v = np.asarray(logits, dtype=np.float64).ravel()
-    v = v - np.max(v)
-    e = np.exp(v)
-    return e / (np.sum(e) + 1e-12)
 
 
 def preprocess(pil_image: Image.Image) -> np.ndarray:
@@ -166,20 +136,17 @@ def preprocess(pil_image: Image.Image) -> np.ndarray:
 
 def predict_teachable(pil_image: Image.Image) -> dict | None:
     """Gibt ``{label, confidence, category, top3, engine}`` oder None zurück."""
-    model = load_teachable_model()
-    if model is None:
+    import keras_numpy
+
+    graph = load_teachable_graph()
+    if graph is None:
         return None
     try:
         labels = load_teachable_labels()
-        logits = np.asarray(model.predict(preprocess(pil_image), verbose=0))[0]
-        n = min(len(logits), len(labels))
-        logits, labels = logits[:n], labels[:n]
-        total = float(np.sum(logits))
-        probs = (
-            np.asarray(logits, dtype=np.float64) / total
-            if 0.99 < total < 1.01
-            else softmax(logits)
-        )
+        probs = keras_numpy.forward_batch(graph, preprocess(pil_image))[0]
+        probs = np.asarray(probs, dtype=np.float64).ravel()
+        n = min(len(probs), len(labels))
+        probs, labels = probs[:n], labels[:n]
         order = np.argsort(probs)[::-1]
         top3 = [(labels[int(i)], float(probs[int(i)])) for i in order[:3]]
         best_label, best_prob = top3[0]
@@ -188,7 +155,7 @@ def predict_teachable(pil_image: Image.Image) -> dict | None:
             "confidence": best_prob,
             "category": TEACHABLE_TO_CATEGORY.get(best_label, "Sonstiges"),
             "top3": top3,
-            "engine": "Teachable Machine (keras_model.h5 · TestKI4)",
+            "engine": "Teachable Machine (keras_model.h5 · numpy)",
         }
     except Exception:
         return None
@@ -207,7 +174,7 @@ def heuristic_guess(pil_image: Image.Image) -> dict:
         return {
             "label": "Dunkles Objekt",
             "confidence": 0.35,
-            "category": "Elektronik & Kabel",
+            "category": "Kopfhörer",
             "top3": [],
             "engine": "Bildmerkmale (Fallback, unsicher)",
         }
@@ -215,14 +182,14 @@ def heuristic_guess(pil_image: Image.Image) -> dict:
         return {
             "label": "Längliches Objekt",
             "confidence": 0.35,
-            "category": "Trinkflaschen & Brotdosen",
+            "category": "Trinkflasche",
             "top3": [],
             "engine": "Bildmerkmale (Fallback, unsicher)",
         }
     return {
         "label": "Unbekannt",
         "confidence": 0.25,
-        "category": "Sonstiges",
+        "category": "Kleidungsstücke",
         "top3": [],
         "engine": "Kein Modell verfügbar",
     }

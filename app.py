@@ -17,7 +17,7 @@ import streamlit as st
 import streamlit_shadcn_ui as ui
 from PIL import Image
 
-from teachable_ai import load_teachable_labels, predict_teachable
+from teachable_ai import heuristic_guess, load_teachable_labels, predict_teachable
 
 # --------------------------------------------------------------------------
 # Setup & Konstanten
@@ -331,13 +331,10 @@ elif tab == "Fund melden":
         with p2:
             if ui.button("🔎 Gegenstand erkennen", key="ai_go"):
                 with st.spinner("KI analysiert das Foto …"):
-                    st.session_state["rep_ai"] = predict_teachable(pil)
+                    ai = predict_teachable(pil) or heuristic_guess(pil)
+                    st.session_state["rep_ai"] = ai
                 ai = st.session_state["rep_ai"]
-                if ai is None:
-                    flash("error", "Modell fehlt",
-                          "keras_model.h5 konnte nicht geladen werden.")
-                else:
-                    st.session_state["rep_name_ai"] = ai["label"].capitalize()
+                st.session_state["rep_name_ai"] = ai["label"].capitalize()
                 st.rerun()
 
             ai = st.session_state.get("rep_ai")
