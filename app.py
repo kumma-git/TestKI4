@@ -109,8 +109,9 @@ def emoji_for(name: str) -> str:
 
 
 def photo(item: dict):
-    p = IMAGE_DIR / item.get("filename", "")
-    if p.exists():
+    fn = item.get("filename") or ""
+    p = IMAGE_DIR / fn
+    if fn and p.is_file():
         st.image(str(p), use_container_width=True)
     else:
         st.markdown(
@@ -146,16 +147,21 @@ st.markdown(
       .stApp { background: #FAFAF9; }
       section[data-testid="stSidebar"] { display: none; }
       h1.fund-title { font-weight: 800; letter-spacing: -.03em; margin: 0;
-                      font-size: clamp(2rem, 5vw, 3rem); }
-      p.fund-sub { color: #71717A; margin: .2rem 0 0; font-size: 1.02rem; }
-      .fund-hero { background: linear-gradient(135deg, #1C1917, #44403C);
-                   color: #fff; border-radius: 1.1rem; padding: 1.5rem 1.7rem; }
-      .fund-hero h2 { margin: 0; letter-spacing: -.02em; }
-      .fund-hero p { margin: .3rem 0 0; opacity: .85; }
+                      font-size: clamp(2rem, 5vw, 3rem); color: #1C1917; }
+      p.fund-sub { color: #57534E; margin: .2rem 0 0; font-size: 1.02rem; }
+      .fund-hero { background: #FFFFFF; color: #1C1917;
+                   border: 1px solid #E7E5E4; border-left: 6px solid #B91C1C;
+                   border-radius: 1.1rem; padding: 1.5rem 1.7rem;
+                   box-shadow: 0 4px 16px rgba(28,25,23,.06); }
+      .fund-hero h2 { margin: 0; letter-spacing: -.02em; color: #1C1917; }
+      .fund-hero p { margin: .3rem 0 0; color: #57534E; }
       .school-seal { width: 92px; height: 92px; border-radius: 50%;
-                     border: 2px solid #1C1917; display: flex;
+                     border: 2px solid #B91C1C; display: flex;
                      align-items: center; justify-content: center;
-                     font-size: 2.2rem; margin: 0 auto; background: #fff; }
+                     font-size: 2.2rem; margin: 0 auto; background: #FFFFFF;
+                     color: #B91C1C; }
+      .school-cap { text-align: center; color: #57534E; font-size: .72rem;
+                    letter-spacing: .06em; margin-top: .4rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -175,8 +181,9 @@ with h1:
         ("KI: keras_model.h5", "outline"),
     ])
 with h2:
-    st.markdown('<div class="school-seal">✚</div>', unsafe_allow_html=True)
-    st.caption("KATHARINEUM<br>ZU LÜBECK")
+    st.markdown('<div class="school-seal">🎒</div>', unsafe_allow_html=True)
+    st.markdown('<div class="school-cap">KATHARINEUM<br>ZU LÜBECK</div>',
+                unsafe_allow_html=True)
 ui.separator()
 
 tab = ui.tabs(TABS, value=st.session_state.get("tab", TABS[0]), key="main_tabs")

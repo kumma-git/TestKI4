@@ -1,0 +1,158 @@
+[
+  {
+    "id": "a00b4e7c-062f-465a-b246-badb18a5e3ec",
+    "name": "Dunkelblaue Regenjacke",
+    "category": "Kleidungsstücke",
+    "description": "Größe M, gelber Reißverschluss, Name im Etikett.",
+    "search_terms": [
+      "dunkelblaue regenjacke",
+      "kleidungsstücke"
+    ],
+    "filename": null,
+    "created_at": "2026-09-21T00:56:17"
+  },
+  {
+    "id": "f61a72f0-70e3-4a97-b6ac-d9c1e119da0d",
+    "name": "Grauer Hoodie",
+    "category": "Kleidungsstücke",
+    "description": "Kapuzenpulli mit Kängurutasche, leicht verwaschen.",
+    "search_terms": [
+      "grauer hoodie",
+      "kleidungsstücke"
+    ],
+    "filename": null,
+    "created_at": "2026-09-19T00:56:17"
+  },
+  {
+    "id": "b6ce085c-5f31-48c7-a8de-c7a0c8b16252",
+    "name": "Federmappe rot kariert",
+    "category": "Schulsachen",
+    "description": "Mit ca. 30 Filzstiften, Initialen J.K.",
+    "search_terms": [
+      "federmappe rot kariert",
+      "schulsachen"
+    ],
+    "filename": null,
+    "created_at": "2026-09-22T00:56:17"
+  },
+  {
+    "id": "4a2d8db5-0600-4e58-842f-da9ba321e45a",
+    "name": "Geodreieck + Zirkel-Set",
+    "category": "Schulsachen",
+    "description": "Im transparenten Etui, Mathe-Raum.",
+    "search_terms": [
+      "geodreieck + zirkel-set",
+      "schulsachen"
+    ],
+    "filename": null,
+    "created_at": "2026-09-17T00:56:17"
+  },
+  {
+    "id": "16f20da8-9e70-4648-8aa1-94dd53df8442",
+    "name": "Trinkflasche 0,75 L grün",
+    "category": "Trinkflasche",
+    "description": "Edelstahl, mattgrün, Sport-Aufkleber.",
+    "search_terms": [
+      "trinkflasche 0,75 l grün",
+      "trinkflasche"
+    ],
+    "filename": null,
+    "created_at": "2026-09-20T00:56:17"
+  },
+  {
+    "id": "ea27e97f-fc6d-4f08-9c8d-bbb4574fb002",
+    "name": "Brotdose gelb",
+    "category": "Brotdose",
+    "description": "Mit Trenner, Name am Boden.",
+    "search_terms": [
+      "brotdose gelb",
+      "brotdose"
+    ],
+    "filename": null,
+    "created_at": "2026-09-16T00:56:17"
+  },
+  {
+    "id": "e13cc7f8-f7ac-4f89-9abc-5c20db789d93",
+    "name": "Regenschirm schwarz",
+    "category": "Regenschirm",
+    "description": "Stockschirm mit Holzgriff, beim Haupteingang.",
+    "search_terms": [
+      "regenschirm schwarz",
+      "regenschirm"
+    ],
+    "filename": null,
+    "created_at": "2026-09-18T00:56:17"
+  },
+  {
+    "id": "c9760e35-394b-49d3-a397-fceae5ef70f5",
+    "name": "Schlüsselbund 3 Schlüssel",
+    "category": "Schlüssel",
+    "description": "Blauer Anhänger der Stadtbibliothek.",
+    "search_terms": [
+      "schlüsselbund 3 schlüssel",
+      "schlüssel"
+    ],
+    "filename": null,
+    "created_at": "2026-09-21T00:56:17"
+  },
+  {
+    "id": "466e54b1-fb52-4969-b086-b02e9dbc90fb",
+    "name": "Kopfhörer schwarz",
+    "category": "Kopfhörer",
+    "description": "Over-Ear mit schwarzem Case, Mensa.",
+    "search_terms": [
+      "kopfhörer schwarz",
+      "kopfhörer"
+    ],
+    "filename": null,
+    "created_at": "2026-09-20T00:56:17"
+  },
+  {
+    "id": "52a33ff5-939e-46ab-8f08-d45b2ec91311",
+    "name": "Brille mit schwarzem Gestell",
+    "category": "Brille",
+    "description": "Im Fachraum MINT gefunden.",
+    "search_terms": [
+      "brille mit schwarzem gestell",
+      "brille"
+    ],
+    "filename": null,
+    "created_at": "2026-09-14T00:56:17"
+  },
+  {
+    "id": "167f3cc2-7901-45a3-93fd-e9ca98fca106",
+    "name": "Braune Geldtasche",
+    "category": "Geldtasche",
+    "description": "Mit Schülerausweis-Fach, Inhalt beim Sekretariat.",
+    "search_terms": [
+      "braune geldtasche",
+      "geldtasche"
+    ],
+    "filename": null,
+    "created_at": "2026-09-22T00:56:17"
+  },
+  {
+    "id": "0fa19d56-991c-49d8-895b-a7e01cf9b92d",
+    "name": "Taschenrechner fx-991",
+    "category": "Taschenrechner",
+    "description": "Solar,Display-Kratzer oben rechts.",
+    "search_terms": [
+      "taschenrechner fx-991",
+      "taschenrechner"
+    ],
+    "filename": null,
+    "created_at": "2026-09-13T00:56:17"
+  },
+  {
+    "id": "10e65b97-7611-4fcd-acfb-7a70ed8b64b7",
+    "name": "Powerbank weiß + Kabel",
+    "category": "Powerbank/Ladekabel",
+    "description": "10000 mAh, USB-C-Kabel dabei, Bibliothek.",
+    "search_terms": [
+      "powerbank weiß + kabel",
+      "powerbank/ladekabel"
+    ],
+    "filename": null,
+    "created_at": "2026-09-20T10:56:34"
+  }
+]
