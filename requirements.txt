@@ -1,7 +1,6 @@
 streamlit
-tensorflow
+tensorflow==2.15.1
 pillow
 numpy
 pandas
-onnxruntime
 streamlit-shadcn-ui
