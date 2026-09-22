@@ -124,10 +124,12 @@ def load_teachable_graph():
 
 
 def preprocess(pil_image: Image.Image) -> np.ndarray:
-    """224x224 RGB, Teachable-Normalisierung (/127.5 - 1), Batch-Dim."""
-    img = pil_image.convert("RGB").resize(
-        (IMAGE_SIZE, IMAGE_SIZE), Image.Resampling.LANCZOS
-    )
+    """224x224 RGB, Teachable-Normalisierung (/127.5 - 1), Batch-Dim.
+
+    Exakt wie im Original (TestKI4-app.py): plain resize ohne Filter
+    (= PIL-Default BICUBIC).
+    """
+    img = pil_image.convert("RGB").resize((IMAGE_SIZE, IMAGE_SIZE))
     arr = np.asarray(img, dtype=np.float32)
     data = np.ndarray(shape=(1, IMAGE_SIZE, IMAGE_SIZE, 3), dtype=np.float32)
     data[0] = (arr / 127.5) - 1.0
