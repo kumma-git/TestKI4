@@ -95,7 +95,8 @@ def show_flash() -> None:
     if msg:
         kind, title, text = msg
         ui.alert(title, text or None,
-                 variant="destructive" if kind == "error" else "default")
+                 variant="destructive" if kind == "error" else "default",
+                 key="flash_alert")
         st.session_state["flash"] = None
 
 
@@ -146,6 +147,9 @@ st.markdown(
     <style>
       .stApp { background: #FAFAF9; }
       section[data-testid="stSidebar"] { display: none; }
+      .block-container, [data-testid="stMainBlockContainer"] {
+        max-width: 880px !important; margin-left: auto !important;
+        margin-right: auto !important; }
       h1.fund-title { font-weight: 800; letter-spacing: -.03em; margin: 0;
                       font-size: clamp(2rem, 5vw, 3rem); color: #1C1917; }
       p.fund-sub { color: #57534E; margin: .2rem 0 0; font-size: 1.02rem; }
@@ -179,7 +183,7 @@ with h1:
         ("Katharineum zu Lübeck", "default"),
         (f"{len(CLASSES)} erkennbare Kategorien", "secondary"),
         ("KI: keras_model.h5", "outline"),
-    ])
+    ], key="head_badges")
 with h2:
     st.markdown('<div class="school-seal">🎒</div>', unsafe_allow_html=True)
     st.markdown('<div class="school-cap">KATHARINEUM<br>ZU LÜBECK</div>',
@@ -204,15 +208,18 @@ if tab == "Stöbern":
 
     c1, c2, c3 = st.columns(3)
     with c1:
-        ui.metric_card("Fundstücke gesamt", len(items), description="im Katalog")
+        ui.metric_card("Fundstücke gesamt", len(items), description="im Katalog",
+                       key="m_total")
     with c2:
-        ui.metric_card("Kategorien", len(CLASSES), description="erkennt die KI")
+        ui.metric_card("Kategorien", len(CLASSES), description="erkennt die KI",
+                       key="m_cats")
     with c3:
         week = (datetime.date.today() - datetime.timedelta(days=7)).isoformat()
         ui.metric_card(
             "Neu diese Woche",
             len([i for i in items if str(i.get("created_at", "")) >= week]),
             description="frisch eingetroffen",
+            key="m_week",
         )
 
     st.write("")
@@ -225,7 +232,8 @@ if tab == "Stöbern":
     for idx, cls in enumerate(CLASSES):
         n = len([i for i in items if i.get("category") == cls])
         with cols[idx % 4]:
-            ui.card(title=f"{emoji_for(cls)} {cls}", description=f"{n} Stück")
+            ui.card(title=f"{emoji_for(cls)} {cls}", description=f"{n} Stück",
+                      key=f"catcard_{idx}")
             if ui.button("Ansehen", key=f"cat_{idx}", variant="outline"):
                 st.session_state["q"] = cls
                 goto("Suchen")
@@ -236,7 +244,7 @@ if tab == "Stöbern":
     if not fresh:
         ui.alert("Noch nichts da",
                  "Sobald etwas gefunden wird, erscheint es hier. Jetzt schon etwas "
-                 "gefunden? Dann melde es!")
+                 "gefunden? Dann melde es!", key="empty_alert")
         if ui.button("Ersten Fund melden", key="empty_go", variant="secondary"):
             goto("Fund melden")
     else:
@@ -246,7 +254,8 @@ if tab == "Stöbern":
                 photo(it)
                 st.markdown(f"**{it.get('name', 'Fundstück')}**")
                 st.caption(it.get("category", ""))
-                ui.badge(it.get("category", ""), variant="secondary")
+                ui.badge(it.get("category", ""), variant="secondary",
+                         key=f"freshbadge_{idx}_{it.get('id')}")
 
 # --------------------------------------------------------------------------
 # Tab: Suchen
@@ -266,7 +275,8 @@ elif tab == "Suchen":
     if not hits:
         ui.alert("Nichts gefunden",
                  "Anderen Begriff versuchen — oder war es vielleicht noch gar "
-                 "nicht im Fundbüro? Dann melde den Verlust im Sekretariat.")
+                 "nicht im Fundbüro? Dann melde den Verlust im Sekretariat.",
+                 key="nohit_alert")
     else:
         for row in range(0, len(hits), 3):
             cols = st.columns(3)
@@ -276,6 +286,7 @@ elif tab == "Suchen":
                         title=f"{emoji_for(it.get('category', ''))} {it.get('name', 'Fundstück')}",
                         description=it.get("category", ""),
                         content=it.get("description", ""),
+                        key=f"hitcard_{it.get('id')}",
                     )
                     photo(it)
                     if it.get("created_at"):
@@ -297,9 +308,10 @@ elif tab == "Suchen":
             for c in CLASSES if any(i.get("category") == c for i in items)]
     if rows:
         ui.bar_chart(pd.DataFrame(rows), x="Kategorie", y="Anzahl",
-                     title="Fundstücke je Kategorie")
+                     title="Fundstücke je Kategorie", key="chart_kat")
     else:
-        ui.alert("Keine Daten", "Noch keine Fundstücke eingetragen.")
+        ui.alert("Keine Daten", "Noch keine Fundstücke eingetragen.",
+                 key="nodata_alert")
 
 # --------------------------------------------------------------------------
 # Tab: Fund melden
@@ -309,6 +321,7 @@ elif tab == "Fund melden":
     ui.card(
         title="In einer Minute eingetragen",
         description="Foto hochladen → KI erkennt den Gegenstand → prüfen & speichern.",
+        key="howto_card",
     )
 
     src = st.radio("Quelle", ["Datei hochladen", "Kamera"],
@@ -323,7 +336,8 @@ elif tab == "Fund melden":
 
     if not st.session_state.get("rep_bytes"):
         ui.alert("Noch kein Foto",
-                 "Lade ein Foto hoch oder nutze die Kamera — dann startet die KI.")
+                 "Lade ein Foto hoch oder nutze die Kamera — dann startet die KI.",
+                 key="nophoto_alert")
         with st.expander("Fototipps 💡"):
             st.markdown(
                 "- Gute Belichtung, ruhiger Hintergrund\n"
@@ -350,18 +364,21 @@ elif tab == "Fund melden":
                     title=f"Erkannt: {ai['label'].capitalize()} "
                           f"{emoji_for(ai['label'])}",
                     description=f"Kategorie „{ai['category']}“ · {ai['engine']}",
+                    key="ai_card",
                 )
                 ui.progress(min(100.0, max(0.0, ai["confidence"] * 100.0)),
-                            label="Sicherheit", show_value=True)
+                            label="Sicherheit", show_value=True, key="ai_prog")
                 if ai.get("top3"):
                     st.caption("Top-3 der KI:")
-                    for lab, prob in ai["top3"]:
+                    for j, (lab, prob) in enumerate(ai["top3"]):
                         st.write(f"{emoji_for(lab)} {lab.capitalize()} — "
                                  f"{prob * 100:.0f} %")
-                        ui.progress(prob * 100.0, show_value=False)
+                        ui.progress(prob * 100.0, show_value=False,
+                                    key=f"ai_top3_{j}")
                 if ai["confidence"] < 0.5:
                     ui.alert("Unsicher",
-                             "Bitte Name und Kategorie unten von Hand prüfen.")
+                             "Bitte Name und Kategorie unten von Hand prüfen.",
+                             key="ai_warn")
 
         st.write("")
         ui.separator()
