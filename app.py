@@ -1,7 +1,7 @@
 """Fundbox — Fundbüro fürs Katharineum zu Lübeck.
 
 Foto rein, KI sagt was es ist, Fund landet im Katalog.
-Modell: keras_model.h5 (Teachable Machine), Klassen: labels.txt.
+Modell: keras_model.h5  (Teachable Machine), Klassen: labels.txt.
 UI: streamlit-shadcn-ui + native Streamlit-Widgets für Upload/Suche.
 """
 
